@@ -56,14 +56,66 @@ spotify_data %>%
              y = danceability)) +
   geom_point(alpha = 0.5) 
 
-# plot danceability by decade
+# plot danceability by year
 spotify_data %>%
   ggplot(aes(x = release_year,
              y = danceability)) +
   geom_point(alpha = 0.5)
 
+# start with spotify_data and then
+# group_by release_year, subgenre, and genre and the
+# summarize the mean of track_popularity
+spotify_summarized <- spotify_data %>%
+  group_by(release_year, playlist_genre, playlist_subgenre) %>%
+  summarise(mean_popularity = mean(track_popularity))
 
+# scatterplot of mean_popularity by release_year
+spotify_summarized %>%
+  ggplot(aes(x = release_year, y = mean_popularity)) +
+  geom_point()
 
+# scatterplot of mean_popularity (y) by release_year (x)
+# across genre (color)
+spotify_summarized %>%
+  ggplot(aes(x = release_year,
+             y = mean_popularity,
+             color = playlist_genre)) +
+  geom_point()
+
+# bar plot of mean_popularity (y) by release_year (x)
+# across genre (fill)
+spotify_summarized %>%
+  ggplot(aes(x = release_year,
+             y = mean_popularity,
+             fill = playlist_genre)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~playlist_subgenre)
+
+# start with original (raw) spotify data
+# group by playlist_genre
+# summarize mean of track_popularity
+spotify_data %>%
+  group_by(playlist_genre) %>%
+  summarise(mean_popularity = mean(track_popularity)) %>%
+  ggplot(aes(x = fct_reorder(playlist_genre, -mean_popularity),
+             y = mean_popularity)) +
+  geom_col() +
+  xlab("Genre") +
+  ylab("Mean Popularity") +
+  ggtitle("Mean Popularity of songs across genre") +
+  theme_minimal()
+
+# add playlist_subgenre to the chart above
+# map playlist_subgenre to x
+# map playlist_genre to fill
+spotify_data %>%
+  group_by(playlist_genre, playlist_subgenre) %>%
+  summarise(mean_popularity = mean(track_popularity)) %>%
+  ggplot(aes(x = fct_reorder(playlist_subgenre, mean_popularity),
+             y = mean_popularity,
+             fill = playlist_genre)) +
+  geom_col() +
+  coord_flip()
 
 
 
