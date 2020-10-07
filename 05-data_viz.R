@@ -117,10 +117,69 @@ spotify_data %>%
   geom_col() +
   coord_flip()
 
+################## OCTOBER 6, 2020 #######################
+# what are the artists represented in this data?
+spotify_data %>%
+  select(track_artist) %>%
+  unique() %>%
+  View()
+
+# Artists: The Beatles, The Cranberries, and Queen
+spotify_filtered <- spotify_data %>%
+  filter(track_artist == "The Beatles" |
+           track_artist == "The Cranberries" |
+           track_artist == "Queen")
+
+# check my new data frame
+spotify_filtered %>%
+  count(track_artist)
+
+# check by artist and decade
+spotify_filtered %>%
+  count(track_artist, decade)
+
+################### summarization ##############
+# summarize mean track_popularity by track_artist and decade
+spotify_filtered %>%
+  group_by(track_artist, decade) %>%
+  summarise(mean_pop = mean(track_popularity))
+
+# plot summarization -- line plot
+spotify_filtered %>%
+  group_by(track_artist, decade) %>%
+  summarise(mean_pop = mean(track_popularity)) %>%
+  ggplot(aes(x = decade,
+             y = mean_pop,
+             color = track_artist)) +
+  geom_point() +
+  geom_line()
+
+# plot summarization -- bar plot
+spotify_filtered %>%
+  group_by(track_artist, decade) %>%
+  summarise(mean_pop = mean(track_popularity)) %>%
+  ggplot(aes(x = decade,
+             y = mean_pop,
+             fill = track_artist)) +
+  geom_col(position = "dodge")
+  
+# plot summarization -- bar plot, faceted by artist
+spotify_filtered %>%
+  group_by(track_artist, decade) %>%
+  summarise(mean_pop = mean(track_popularity)) %>%
+  ggplot(aes(x = decade,
+             y = mean_pop,
+             fill = track_artist)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~track_artist)
 
 
-
-
-
+# summarization: add standard deviation to summarise()
+# using sd()
+spotify_filtered %>%
+  group_by(track_artist, decade) %>%
+  summarise(mean_pop = mean(track_popularity),
+            sd_pop = sd(track_popularity),
+            song_count = n())
 
 
