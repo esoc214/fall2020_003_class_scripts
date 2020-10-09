@@ -94,6 +94,27 @@ spotify_summarized %>%
 # start with original (raw) spotify data
 # group by playlist_genre
 # summarize mean of track_popularity
+library(extrafont)
+loadfonts()
+
+spotify_data %>%
+  group_by(playlist_genre) %>%
+  summarise(mean_popularity = mean(track_popularity)) %>%
+  ggplot(aes(x = reorder(playlist_genre, -mean_popularity), 
+             y = mean_popularity,
+             fill = playlist_genre)) +
+  geom_col() +
+  xlab("") +
+  ylab("mean popularity") +
+  theme_minimal() +
+  ggtitle("Mean popularity of songs by genre") +
+  theme(text=element_text(size=16,  family="serif")) +
+  theme(legend.position = "none")
+
+
+
+
+
 spotify_data %>%
   group_by(playlist_genre) %>%
   summarise(mean_popularity = mean(track_popularity)) %>%
@@ -181,5 +202,78 @@ spotify_filtered %>%
   summarise(mean_pop = mean(track_popularity),
             sd_pop = sd(track_popularity),
             song_count = n())
+
+############# OCTOBER 08 ##################
+# 1. filter you data (DONE) resulting dataframe spotify_filtered
+# 2. summarization: group_by() + summarise() (optional mutate())
+# 3. plot summarized data
+spotify_filtered %>%
+  group_by(track_artist, decade) %>%
+  summarise(mean_popularity = mean(track_popularity)) %>%
+  ggplot(aes(x = decade,
+             y = mean_popularity,
+             fill = track_artist)) +
+  geom_col() +
+  facet_wrap(~track_artist)
+
+# start with spotify_filtered
+# group_by track_artist and decade
+# summarise both mean and sd of track_popularity
+# create new variables: upper = mean + sd AND lower = mean - sd
+spotify_filtered %>%
+  group_by(track_artist, decade) %>%
+  summarise(song_count = n(),
+            mean_popularity = mean(track_popularity),
+            sd_popularity = sd(track_popularity)) %>%
+  mutate(upper = mean_popularity + sd_popularity,
+         lower = mean_popularity - sd_popularity) %>%
+  ggplot(aes(x = decade,
+             y = mean_popularity,
+             fill = track_artist)) +
+  geom_col() +
+  facet_wrap(~track_artist) +
+  geom_errorbar(aes(ymin = lower,
+                    ymax = upper))
+
+
+# redo the plot above, but without decade
+# group_by just by track_artist
+# map x to track_artist
+spotify_filtered %>%
+  group_by(track_artist) %>%
+  summarise(mean_popularity = mean(track_popularity),
+            sd_popularity = sd(track_popularity)) %>%
+  mutate(upper = mean_popularity + sd_popularity,
+         lower = mean_popularity - sd_popularity) %>%
+  ggplot(aes(x = track_artist, y = mean_popularity,
+             fill = track_artist)) +
+  geom_col() +
+  geom_errorbar(aes(ymin = lower,
+                    ymax = upper)) +
+  xlab("") +
+  ylab("mean popularity") +
+  ggtitle("Mean Popularity of Songs across 3 Artists") +
+  theme_bw() +
+  theme(legend.position = "none")
+
+
+
+
+spotify_filtered %>%
+  group_by(track_artist)%>%
+  summarise(mean_popularity = mean(track_popularity),
+            sd_popularity= sd(track_popularity)) %>%
+  mutate(upper= mean_popularity + sd_popularity,
+         lower= mean_popularity - sd_popularity) %>% 
+  ggplot(aes(x=track_artist, 
+             y= mean_popularity, 
+             fill=track_artist))  +
+  geom_col() +
+  geom_errorbar(aes(ymin = lower,
+                    ymax = upper))
+
+
+
+
 
 
