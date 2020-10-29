@@ -57,5 +57,52 @@ global_temp_cont %>%
   geom_point() +
   geom_line()
 
+############## OCTOBER 27 #############
+# get decade from year
+# 1986 to 1980
+# 1873 to 1870
+(1986 %/% 10) * 10
+1986 - (1986 %% 10)
 
+# mutate my data frame to add a column for decade
+global_temp_cont <- global_temp_cont %>%
+  mutate(decade = (year %/% 10) * 10)
+
+# start with global_temp_cont data frame and then
+# summarise mean of average_temperature by continent and decade
+# plot it
+global_temp_cont %>%
+  group_by(continent, decade) %>%
+  summarise(mean_temp = mean(average_temperature, na.rm = TRUE)) %>%
+  ggplot(aes(x = decade, y = mean_temp, color = continent)) +
+  geom_point() +
+  geom_line() +
+  geom_label(aes(label = round(mean_temp, digits = 0)))
+
+# start with global_temp_cont data frame and then
+# filter for continent == "Europe"
+# summarise mean of average_temperature by decade and then
+# plot it
+global_temp_cont %>%
+  filter(continent == "Europe") %>%
+  group_by(decade) %>%
+  summarise(mean_temp = mean(average_temperature, na.rm = TRUE)) %>%
+  ggplot(aes(x = decade, y = mean_temp)) +
+  geom_point()
+
+# do year instead of decade
+global_temp_cont %>%
+  filter(continent == "Europe") %>%
+  group_by(year) %>%
+  summarise(mean_temp = mean(average_temperature, na.rm = TRUE)) %>%
+  ggplot(aes(x = year, y = mean_temp)) +
+  geom_point()
+
+# do dt
+global_temp_cont %>%
+  filter(continent == "Europe") %>%
+  group_by(dt) %>%
+  summarise(mean_temp = mean(average_temperature, na.rm = TRUE)) %>%
+  ggplot(aes(x = dt, y = mean_temp)) +
+  geom_point()
 
