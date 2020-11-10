@@ -74,5 +74,77 @@ beer_awards %>%
   count(medal, category) %>%
   arrange(-n)
 
+################## November 05, 2020 #####################
+# Question: What's the relationship between number of medals per 
+# state and the population size per state? Do states with more
+# people get more medals?
 
+# create count of medals per state
+medal_count_per_state <- beer_awards %>%
+  count(state)
+
+# usmap library
+#install.packages("usmap")
+library(usmap)
+
+# create new data frame with just two columns abbr and pop_2015
+us_population <- statepop %>%
+  select("state" = abbr, 
+         "population" = pop_2015)
+
+# join medal_count_per_state with us_population to add 
+# population per state to the medal_count_per_state data frame
+medal_count_per_state <- left_join(medal_count_per_state,
+                                   us_population)
+
+# change default display of scientific notation
+options(scipen = 999)
+
+# starting with medal_count_per state, draw a plot
+# three variables to map: state, n, population
+medal_count_per_state %>%
+  ggplot(aes(x = population,
+             y = n)) +
+  geom_point() +
+  geom_label(aes(label = state),
+             fill = "darkgoldenrod",
+             color = "white") +
+  theme_bw()
+
+medal_count_per_state %>%
+  ggplot(aes(x = population,
+             y = n)) +
+  geom_point() +
+  geom_label(aes(label = state,
+                 fill = state)) +
+  theme(legend.position = "none")
+
+# same plot but filter for states with pop lower than 10m people
+medal_count_per_state %>%
+  filter(population < 10000000) %>%
+  ggplot(aes(x = population,
+             y = n)) +
+  geom_point() +
+  geom_label(aes(label = state),
+             fill = "darkgoldenrod",
+             color = "white") +
+  theme_bw()
+
+# plot a US map
+plot_usmap(data = medal_count_per_state,
+           values = "n") +
+  theme(legend.position = "right") +
+  scale_fill_continuous(name = "Medal Count",
+                        low = "bisque",
+                        high = "goldenrod3")
+
+# plot a US map of medals per person
+medal_count_per_state %>%
+  mutate(medals_per_10kpeople = (n/population)*10000) %>%
+  plot_usmap(data = .,
+             values = "medals_per_10kpeople") +
+  theme(legend.position = "right") +
+  scale_fill_continuous(name = "Medals per 10k People",
+                        low = "bisque",
+                        high = "darkorange4")
 

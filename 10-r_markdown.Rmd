@@ -1,0 +1,88 @@
+---
+title: "Analysis of Beer Awards in the US"
+author: "Adriana Picoral"
+date: "November 10, 2020"
+output:
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Formatting
+
+## Text Formatting
+
+You can make words **bold** or *italics*.
+
+You can also underscore for __bold__ or _italics_.
+
+## Lists
+
+There are two types of lists
+
+- first bullet list item
+- second bullet list item
+
+1. first numbered list item
+1. second numbered list item
+1. third numbered list item
+
+## Quotes
+
+> This is a quote from someone
+
+# Beer Award Analysis
+
+## Data Description
+
+The data comes from the [Great American Beer Festival](https://www.greatamericanbeerfestival.com/the-competition/winners/). 
+
+```{r message=FALSE, echo=FALSE}
+# load libraries
+library(tidyverse)
+library(knitr)
+```
+
+```{r}
+# read data in
+beer_awards <- read_csv("data/clean_beer_awards.csv")
+#beer_awards <- read_csv("https://raw.githubusercontent.com/esoc214/fall2020_002_class_scripts/main/data/clean_beer_awards.csv")
+```
+
+## Data Questions
+
+My data questions are as follows:
+
+1. Which region in the US has the most beer awards?
+1. Which type of beer gets the most awards across different regions in the US?
+
+## Number of Awards per Region
+
+```{r}
+# start with beer_awards data and then
+# filter District of Columbia out and then
+# count region
+beer_awards %>%
+  filter(region != "District of Columbia") %>%
+  count(region) %>%
+  arrange(-n) %>%
+  kable(col.names = c("Regions in the US", "Total Awards"),
+        caption = "Total number of beer awards per region in the US.")
+```
+
+Regarding my first data question (i.e., *Which region in the US has the most beer awards?*), the West has the most awards.
+
+## Beer Type per Region
+
+```{r}
+# start with beer_awards and then
+# filter to keep regions that are different from "District of Colombia"
+# count macro_category per region
+beer_awards %>%
+  filter(region != "District of Colombia") %>%
+  count(macro_category, region)
+```
+
