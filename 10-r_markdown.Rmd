@@ -58,6 +58,7 @@ My data questions are as follows:
 
 1. Which region in the US has the most beer awards?
 1. Which type of beer gets the most awards across different regions in the US?
+1. Which type of beer gets the most awards across different years?
 
 ## Number of Awards per Region
 
@@ -77,12 +78,56 @@ Regarding my first data question (i.e., *Which region in the US has the most bee
 
 ## Beer Type per Region
 
-```{r}
+There is a total of 515 categories of beers in this data. These categories were re-coded into 20 beer type (also called macro-categories). See table below for an explanation of these beer types.
+
+| Beer Type | Explanation |
+| --------- | ----------- |
+| Ale | Ales are any beers that have "ale" in their category name |
+| Aged | Aged beers are beers that have "aged" in their category name |
+
+
+
+
+As show in the figure below, the type of beer that gets the most awards across different regions in the US is *ale*.
+
+```{r echo=FALSE, fig.dim=c(8, 6)}
+library(tidytext)
+
 # start with beer_awards and then
 # filter to keep regions that are different from "District of Colombia"
 # count macro_category per region
 beer_awards %>%
-  filter(region != "District of Colombia") %>%
-  count(macro_category, region)
+  filter(region != "District of Columbia") %>%
+  count(macro_category, region) %>%
+  ggplot(aes(x = n,
+             y = reorder_within(macro_category, n, region),
+             fill = region)) +
+  geom_col() +
+  facet_wrap(~region, scales = "free") +
+  scale_y_reordered() +
+  theme_linedraw() +
+  theme(legend.position = "none") +
+  labs(x = "Total Number of Awards",
+       y = "",
+       caption = "Data from the Great American Beer Festival")
 ```
 
+As shown in the figure below, the type of beer that gets the most awards across different years is Ale by far. For comparison, the plot also displays the beer types with the second and third most awards.
+
+```{r echo=FALSE}
+beer_awards %>%
+  count(macro_category) %>%
+  top_n(5)
+
+# Which type of beer gets the most awards across different years?
+# draw a line plot of macro_category by year
+beer_awards %>%
+  filter(macro_category %in% c("ale", "flavored", "lager")) %>%
+  count(macro_category, year) %>%
+  ggplot(aes(x = year,
+             y = n,
+             color = macro_category)) +
+  geom_line(aes(linetype = macro_category))
+
+
+```
