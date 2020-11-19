@@ -1,0 +1,77 @@
+---
+title: "Presidential Elections 2020"
+author: "Adriana Picoral"
+date: "11/19/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(usmap)
+```
+
+# Presidential Elections 2020 -- Analysis report
+
+## Results by state and total electoral votes
+
+The map below shows each state and which presidential candidate (Donald Trump or Joe Biden) won that state. Joe Biden got a total of 306 electoral votes, and Donald Trump a total of 232 electoral votes.
+
+
+```{r echo=FALSE, message=FALSE}
+# read in the data
+election_2020_data <- read_csv("data/presidential_elections_2020.csv")
+
+# plot a map with candidate that one each state
+election_2020_data %>%
+  plot_usmap(data = .,
+             values = "candidate") +
+  theme(legend.position = "right") +
+  scale_fill_manual(values = c("red3", "royalblue3"),
+                    name = "Presidential Candidates") +
+  ggtitle("States by Candidate with the Most Popular Votes")
+```
+
+```{r echo=FALSE, message=FALSE, fig.dim=c(7, 2)}
+# draw a horizontal bar plot with total number of electoral votes per candidate
+# add geom label with aes mapped label = electoral_votes
+# remove legend (define legend.position = "none") -- check in 2:50pm
+election_2020_data %>%
+  group_by(candidate) %>%
+  summarise(total_electoral_votes = sum(electoral_votes)) %>%
+  ggplot(aes(y = candidate,
+             x = total_electoral_votes,
+             fill = candidate)) +
+  geom_col() +
+  geom_label(aes(label = total_electoral_votes)) +
+  scale_fill_manual(values = c("red3", "royalblue3")) +
+  theme(legend.position = "none") +
+  labs(y = "",
+       x = "Total Electoral Votes")
+```
+
+## Popular Vote Results
+
+```{r echo=FALSE, message=FALSE}
+# read data in
+election_data <- read_csv("data/president_county_candidate.csv")
+
+# plot popular vote count (sum of total_votes)
+election_data %>%
+  group_by(candidate) %>%
+  summarise(popular_votes = sum(total_votes)) %>%
+  filter(popular_votes > 10000) %>%
+  ggplot(aes(y = reorder(candidate, popular_votes),
+             x = popular_votes)) +
+  geom_col() +
+  geom_label(aes(label = popular_votes)) +
+  labs(x = "Total Number of Popular Votes",
+       y = "",
+       title = "Total Number of Popular Votes for Presidential Elections (2020)",
+       subtitle = "Displaying only candidates with 10k votes or more") +
+  theme(panel.grid = element_blank(),
+        axis.text.x = element_blank())
+```
+
+
+
