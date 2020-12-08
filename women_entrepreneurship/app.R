@@ -20,15 +20,21 @@ women_entrepreneur_data <- read_delim("data/women_in_labor_force.csv",
 ui <- fluidPage(
 
     # Application title
-    titlePanel("Old Faithful Geyser Data"),
+    titlePanel("Women Entrepreneurship Data"),
 
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
         sidebarPanel(
-            selectInput("variable",
+            selectInput("y_variable",
                         "Select variable:",
                         c("inflation_rate",
-                          "entrepreneurship_index"))
+                          "entrepreneurship_index",
+                          "women_entrepreneurship_index",
+                          "female_labor_force_participation_rate")),
+            selectInput("filter_variable",
+                        "Select type of country:",
+                        c("Developed", "Developing"),
+                        multiple = TRUE)
         ),
 
         # Show a plot of the generated distribution
@@ -37,14 +43,15 @@ ui <- fluidPage(
         )
     )
 )
-
+ 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
     output$my_plot <- renderPlot({
         women_entrepreneur_data %>%
+            filter(level_of_development == input$filter_variable) %>%
             ggplot(aes(x = level_of_development)) +
-            geom_boxplot(aes_string(y = input$variable)) +
+            geom_boxplot(aes_string(y = input$y_variable)) +
             theme_linedraw()
     })
 }
